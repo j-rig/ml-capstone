@@ -1,0 +1,11 @@
+notebook==6.0.3
+pandas
+pyarrow
+seaborn
+fastparquet
+h3
+nltk
+scikit-learn
+fastai
+joblib
+xlrd
