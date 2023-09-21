@@ -23,6 +23,7 @@ setup(
         "beautifulsoup4",
         "extruct",
         "python-dotenv",
+        "email_validator",
     ],
     entry_points={"console_scripts": ["bizwiz = bizwiz.cli:main"]},
     dependency_links=[],

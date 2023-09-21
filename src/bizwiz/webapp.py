@@ -1,22 +1,43 @@
 from socket import gethostname
+from uuid import uuid4
+import datetime
+import json
+import os
+import locale
 
+from flask_wtf import FlaskForm as Form
+from wtforms import StringField, SubmitField
+from wtforms import validators, TextAreaField
+from wtforms.fields import EmailField
+from flask import session, redirect, request
 from flask import Flask, Response
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_basicauth import BasicAuth
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_restful import Resource, Api
 from werkzeug.exceptions import HTTPException
+from flask_bootstrap import Bootstrap
+
+
+from bizwiz.pipeline import pipeline
+
+locale.setlocale(locale.LC_ALL, 'en_US')
 
 app = Flask(__name__)
 
+app.secret_key = os.environ.get("WEBAPP_SECRET", "word")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/bizwiz.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "WEBAPP_DBURI", "sqlite:////tmp/bizwiz.sqlite"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["BASIC_AUTH_USERNAME"] = "admin"
-app.config["BASIC_AUTH_PASSWORD"] = "admin"
-app.config["FLASK_ADMIN_SWATCH"] = "cerulean"
+app.config["BASIC_AUTH_USERNAME"] = os.environ.get("WEBAPP_ADMIN_USER", "admin")
+app.config["BASIC_AUTH_PASSWORD"] = os.environ.get("WEBAPP_ADMIN_PASS", "admin")
+app.config["FLASK_ADMIN_SWATCH"] = "slate"
 
+Bootstrap(app)
 api = Api(app)
 db = SQLAlchemy(app)
 basic_auth = BasicAuth(app)
@@ -26,12 +47,57 @@ admin = Admin(app, name="bizwiz admin", template_mode="bootstrap3")
 # Create models
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String())
+    ts = db.Column(db.DateTime)
+    uuid = db.Column(db.String())
     url = db.Column(db.String())
-    text = db.Column(db.String())
-    model = db.Column(db.String())
-    result = db.Column(db.String())
+    visible = db.Column(db.Boolean)
+    json = db.Column(db.String())
 
 
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String())
+    ts = db.Column(db.DateTime)
+    uuid = db.Column(db.String())
+    email = db.Column(db.String())
+    message = db.Column(db.String())
+
+
+# Create forms
+
+
+class ContactForm(Form):
+    email = EmailField("email", [validators.DataRequired(), validators.Email()])
+    message = TextAreaField(
+        "message", [validators.DataRequired(), validators.Length(min=6, max=2000)]
+    )
+    submit_button = SubmitField("submit")
+
+
+base_url = "https://www.bizbuysell.com/Business-Opportunity"
+
+
+def bbs_url_validator(form, field):
+    url = field.data
+    if not url.lower().startswith(base_url.lower()):
+        raise validators.ValidationError(f"Url must begin with {base_url}")
+
+
+class BizBuySellUrlForm(Form):
+    url = StringField(
+        "bizbuysell url",
+        [
+            validators.DataRequired(),
+            bbs_url_validator,
+            validators.Length(min=len(base_url) + 1, max=2083),
+            validators.URL(),
+        ],
+    )
+    submit_button = SubmitField("submit")
+
+
+# basic auth for admin
 class AuthException(HTTPException):
     def __init__(self, message):
         super().__init__(
@@ -54,19 +120,86 @@ class AuthModelView(ModelView):
 
 
 admin.add_view(AuthModelView(Prediction, db.session))
+admin.add_view(AuthModelView(Contact, db.session))
+
+def as_dollar(n):
+    return locale.currency(n, grouping=True)
+
+def check_uuid():
+    if "uuid" not in session:
+        session["uuid"] = str(uuid4())
 
 
 @app.route("/")
-def hello():
-    return "Hello, World!"
+def home():
+    check_uuid()
+    return render_template("index.html")
 
 
-class HelloWorld(Resource):
-    def get(self):
-        return {"hello": "world"}
+@app.route("/dash", methods=["GET", "POST"])
+def dash():
+    check_uuid()
+    form = BizBuySellUrlForm()
+    if form.validate_on_submit():
+        pred = Prediction()
+        pred.ts = datetime.datetime.utcnow()
+        pred.ip = request.remote_addr
+        pred.uuid = session["uuid"]
+        pred.url = form.url.data
+        pred.visible = True
+        result = pipeline(dict(url=form.url.data))
+        del result["scratch"]
+        pred.json = json.dumps(result)
+        db.session.add(pred)
+        db.session.commit()
+        return redirect("/dash")
+    pl = (
+        Prediction.query.filter_by(uuid=session["uuid"], visible=True)
+        .order_by(Prediction.id.desc())
+        .limit(50)
+        .all()
+    )
+    pll=[ json.loads(p.json) for p in pl]
+    return render_template("dash.html", form=form, pl=pll, as_dollar=as_dollar)
 
 
-api.add_resource(HelloWorld, "/api/hello")
+@app.route("/about")
+def about():
+    check_uuid()
+    return render_template("about.html")
+
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    check_uuid()
+    form = ContactForm()
+    if form.validate_on_submit():
+        contact = Contact()
+        contact.ts = datetime.datetime.utcnow()
+        contact.ip = request.remote_addr
+        contact.uuid = session["uuid"]
+        contact.email = form.email.data
+        contact.message = form.message.data
+        db.session.add(contact)
+        db.session.commit()
+        return redirect("/contact/thanks")
+    return render_template("contact.html", form=form)
+
+
+@app.route("/contact/thanks")
+def thanks():
+    check_uuid()
+    return render_template("thanks.html")
+
+#TODO
+# class bizBuySellUrl(Resource):
+#     def get(self,url):
+#         result = pipeline(dict(url=url))
+#         del result["scratch"]
+#         return result
+
+
+# api.add_resource(bizBuySellUrl, "/api/bizbuysell/url")
 
 if __name__ == "__main__":
     with app.app_context():

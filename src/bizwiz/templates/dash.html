@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Dash{% endblock %}
+
+{% block content %}
+
+  <h1>Dash</h1>
+<div class="row row-cols-1">
+  <div class="col mb-4">
+      {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+</div>
+</div>
+      <div class="row row-cols-1 row-cols-md-2">
+
+
+      {% for p in pl %}
+
+      {% if 'error' in p %}
+<div class="col mb-4">
+      <div class="card" >
+        <div class="card-body">
+          <h5 class="card-title">Error</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ p.url}}</h6>
+
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-warning">{{ p.error.message }}</li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+
+      {%- else %}
+
+      <div class="col mb-4">
+
+      <div class="card" >
+        {% if 'image' in p and p.image %}
+         <img class="card-img-top" src="{{ p.image }}" alt="Card image cap">
+         {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ p.title}}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ p.url}}</h6>
+          <ul class="list-group">
+            <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
+            <li class="list-group-item">Model Price: {{ as_dollar(p.pprice) }}</li>
+            <li class="list-group-item">Predictive N-grams:
+              {% for w in p.pwords %}
+                <button type="button" class="btn btn-outline-info btn-sm">{{ w }}</button>
+              {% endfor %}
+            </li>
+          </ul>
+          <a href="{{ p.url }}" class="card-link" target=”_blank”>{{ p.id }}</a>
+        </div>
+      </div>
+
+    </div>
+
+      {% endif %}
+
+      {% endfor %}
+
+      </div>
+{% endblock %}

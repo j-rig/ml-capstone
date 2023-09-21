@@ -39,3 +39,7 @@ run_webapp(){
   docker run -p 5000:5000 \
     ml-capstone-webapp python3 /var/app/bizwiz/webapp.py;
 }
+
+run_webapp_venv(){
+  python3 src/bizwiz/webapp.py;
+}
