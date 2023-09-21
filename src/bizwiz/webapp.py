@@ -23,7 +23,7 @@ from flask_bootstrap import Bootstrap
 
 from bizwiz.pipeline import pipeline
 
-locale.setlocale(locale.LC_ALL, 'en_US')
+locale.setlocale(locale.LC_ALL, "en_US")
 
 app = Flask(__name__)
 
@@ -122,8 +122,10 @@ class AuthModelView(ModelView):
 admin.add_view(AuthModelView(Prediction, db.session))
 admin.add_view(AuthModelView(Contact, db.session))
 
+
 def as_dollar(n):
     return locale.currency(n, grouping=True)
+
 
 def check_uuid():
     if "uuid" not in session:
@@ -159,7 +161,7 @@ def dash():
         .limit(50)
         .all()
     )
-    pll=[ json.loads(p.json) for p in pl]
+    pll = [json.loads(p.json) for p in pl]
     return render_template("dash.html", form=form, pl=pll, as_dollar=as_dollar)
 
 
@@ -191,7 +193,8 @@ def thanks():
     check_uuid()
     return render_template("thanks.html")
 
-#TODO
+
+# TODO
 # class bizBuySellUrl(Resource):
 #     def get(self,url):
 #         result = pipeline(dict(url=url))

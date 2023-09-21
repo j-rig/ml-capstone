@@ -215,7 +215,7 @@ def predict_price(o):
     feature_names = np.array(mvect.get_feature_names_out())
     ytest = model.predict(Xtest)
     o["pprice"] = ytest[0]
-    o["pwords"] = [ str(x) for x in feature_names[importance[:20]]]
+    o["pwords"] = [str(x) for x in feature_names[importance[:20]]]
     return True, o
 
 
