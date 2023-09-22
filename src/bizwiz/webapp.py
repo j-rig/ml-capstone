@@ -9,7 +9,7 @@ from flask_wtf import FlaskForm as Form
 from wtforms import StringField, SubmitField
 from wtforms import validators, TextAreaField
 from wtforms.fields import EmailField
-from flask import session, redirect, request
+from flask import session, redirect, request, jsonify
 from flask import Flask, Response
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
@@ -165,10 +165,40 @@ def dash():
     return render_template("dash.html", form=form, pl=pll, as_dollar=as_dollar)
 
 
+# TODO
+# @app.route("/export")
+# @basic_auth.required
+# def export():
+#     check_uuid()
+#     def generate():
+#         pl = (
+#             Prediction.query.filter_by(uuid=session["uuid"], visible=True)
+#             .order_by(Prediction.id.desc())
+#             .all()
+#         )
+#         pll = [json.loads(p.json) for p in pl]
+#         #print(pll)
+#         yield f'id,url,price,model_price\n'
+#         for p in pll:
+#             if 'error' not in p.keys():
+#                 yield f'{p.id},{p.url},{p.price},{p.pprice}\n'
+#     return Response(generate(), mimetype='text/csv')
+
+
 @app.route("/about")
 def about():
     check_uuid()
     return render_template("about.html")
+
+
+@app.route("/env")
+@basic_auth.required
+def env():
+    def generate():
+        for k, v in os.environ.items():
+            yield f"{k}={v}\n"
+
+    return Response(generate(), mimetype="text/plain")
 
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -194,18 +224,19 @@ def thanks():
     return render_template("thanks.html")
 
 
-# TODO
-# class bizBuySellUrl(Resource):
-#     def get(self,url):
-#         result = pipeline(dict(url=url))
-#         del result["scratch"]
-#         return result
+class bizBuySellUrl(Resource):
+    def post(self):
+        json_data = request.get_json(force=True)
+        result = pipeline(json_data)
+        del result["scratch"]
+        return jsonify(result)
 
 
-# api.add_resource(bizBuySellUrl, "/api/bizbuysell/url")
+api.add_resource(bizBuySellUrl, "/api/bizbuysell/url")
+
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        if "liveconsole" not in gethostname():
-            app.run(debug=True, host="0.0.0.0")
+    if "liveconsole" not in gethostname():
+        app.run(debug=True, host="0.0.0.0")

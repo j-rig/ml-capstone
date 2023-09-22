@@ -25,9 +25,10 @@ logger = logging.getLogger(__name__)
 nltk.download("punkt")
 nltk.download("stopwords")
 
-
-model_path = os.path.join(os.path.dirname(__file__), "data", "model.sdgr.joblib")
-
+model_path = os.environ.get(
+    "WEBAPP_MODEL_PATH",
+    os.path.join(os.path.dirname(__file__), "data", "model.sdgr.joblib"),
+)
 mvect, model = joblib.load(model_path)
 
 ua = [
@@ -98,7 +99,7 @@ def validate_url(o):
 def get_page(o):
     logger.info("getting page")
     headers = {"User-Agent": random.choice(ua)}
-    result = requests.get(o["url"], headers=headers, timeout=10, verify=False)
+    result = requests.get(o["url"], headers=headers, timeout=60, verify=False)
     if not result.status_code == 200:
         o["error"] = dict(
             code=result.status_code, message="failed to read page", data=result.reason
