@@ -7,5 +7,5 @@ h3
 nltk
 scikit-learn
 fastai
-joblib
+joblib==1.1.0
 xlrd

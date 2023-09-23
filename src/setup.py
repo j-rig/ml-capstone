@@ -17,7 +17,7 @@ setup(
         "Flask-BasicAuth",
         "Flask-SQLAlchemy",
         "SQLAlchemy",
-        "joblib",
+        "joblib==1.1.0",
         "scikit-learn",
         "nltk",
         "beautifulsoup4",
