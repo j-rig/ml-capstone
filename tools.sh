@@ -28,7 +28,8 @@ run_notebook(){
   cd ../;
   docker run -p 8888:8888 \
     --mount type=bind,source="$(pwd)"/ml-capstone,target=/app \
-    ml-capstone-notebook jupyter notebook --allow-root --ip 0.0.0.0
+    ml-capstone-notebook jupyter notebook --allow-root --ip 0.0.0.0;
+  cd ml-capsone;
 }
 
 build_webapp(){
@@ -42,4 +43,10 @@ run_webapp(){
 
 run_webapp_venv(){
   python3 src/bizwiz/webapp.py;
+}
+
+package_bizwiz(){
+  cd src/;
+  python setup.py sdist;
+  cd ../;
 }
