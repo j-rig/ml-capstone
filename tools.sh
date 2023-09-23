@@ -12,12 +12,17 @@ setup_venv(){
 
 fmt_it(){
   echo "formating...";
-  black src;
+  black src test;
 }
 
 lint_it(){
   echo "linting...";
   pylint --exit-zero src;
+}
+
+test_it(){
+  echo "testing...";
+  PYTHONPATH="$PWD/test" pytest test;
 }
 
 build_notebook(){

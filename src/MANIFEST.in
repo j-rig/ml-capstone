@@ -1,0 +1,3 @@
+recursive-include bizwiz/data/ *.joblib
+recursive-include bizwiz/static/ *.jpg *.css *.js
+recursive-include bizwiz/templates/ *.html
