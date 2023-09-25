@@ -6,4 +6,3 @@ RUN pip install --upgrade pip
 RUN pip install wheel
 COPY notebook.req.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
-#COPY data/model.lr.joblib /var/model.lr.joblib

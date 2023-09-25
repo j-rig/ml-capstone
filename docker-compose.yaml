@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  webapp:
+    command: python3 /var/app/bizwiz/webapp.py
+    image: ml-capstone-webapp
+    build:
+      context: .
+      dockerfile: webapp.Dockerfile
+    ports:
+      - '5000:5000'

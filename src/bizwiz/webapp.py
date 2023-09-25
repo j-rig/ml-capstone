@@ -21,9 +21,9 @@ from werkzeug.exceptions import HTTPException
 from flask_bootstrap import Bootstrap
 
 
-from bizwiz.pipeline import pipeline
+from bizwiz.pipeline import pipeline, predict_funcs
 
-locale.setlocale(locale.LC_ALL, "en_US")
+locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
 app = Flask(__name__)
 
@@ -149,7 +149,7 @@ def dash():
         pred.uuid = session["uuid"]
         pred.url = form.url.data
         pred.visible = True
-        result = pipeline(dict(url=form.url.data))
+        result = pipeline(dict(url=form.url.data), predict_funcs)
         del result["scratch"]
         pred.json = json.dumps(result)
         db.session.add(pred)
@@ -227,7 +227,7 @@ def thanks():
 class bizBuySellUrl(Resource):
     def post(self):
         json_data = request.get_json(force=True)
-        result = pipeline(json_data)
+        result = pipeline(json_data, predict_funcs)
         del result["scratch"]
         return jsonify(result)
 

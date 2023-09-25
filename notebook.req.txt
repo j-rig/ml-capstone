@@ -4,8 +4,8 @@ pyarrow
 seaborn
 fastparquet
 h3
-nltk
-scikit-learn
+nltk==3.6.7
+scikit-learn==1.0.2
 fastai
 joblib==1.1.0
 xlrd

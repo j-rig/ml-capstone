@@ -17,6 +17,10 @@ import string
 from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
+import pickle
+
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.linear_model import SGDRegressor
 
 warnings.filterwarnings("ignore")
 
@@ -30,6 +34,13 @@ model_path = os.environ.get(
     os.path.join(os.path.dirname(__file__), "data", "model.sdgr.joblib"),
 )
 mvect, model = joblib.load(model_path)
+
+# model_path = os.environ.get(
+#     "WEBAPP_MODEL_PATH",
+#     os.path.join(os.path.dirname(__file__), "data", "model.sdgr.pkl"),
+# )
+# mvect, model = pickle.load(model_path)
+
 
 ua = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
@@ -220,23 +231,28 @@ def predict_price(o):
     return True, o
 
 
-def pipeline(o):
-    for func in [
-        validate_url,
-        get_page,
-        get_metadata,
-        get_soup,
-        extract_price,
-        extract_title,
-        process_title,
-        extract_desc,
-        process_desc,
-        extract_id,
-        extract_image,
-        extract_details,
-        process_details,
-        predict_price,
-    ]:
+predict_funcs = [
+    validate_url,
+    get_page,
+    get_metadata,
+    get_soup,
+    extract_price,
+    extract_title,
+    process_title,
+    extract_desc,
+    process_desc,
+    extract_id,
+    extract_image,
+    extract_details,
+    process_details,
+    predict_price,
+]
+
+listing_funcs = []
+
+
+def pipeline(o, l):
+    for func in l:
         r, o = func(o)
         if not r:
             break

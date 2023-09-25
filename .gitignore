@@ -7,3 +7,4 @@ __pycache__
 tbr
 src.zip
 dist
+.pytest_cache
