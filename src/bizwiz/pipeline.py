@@ -17,10 +17,6 @@ import string
 from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
-import pickle
-
-# from sklearn.feature_extraction.text import TfidfVectorizer
-# from sklearn.linear_model import SGDRegressor
 
 warnings.filterwarnings("ignore")
 
@@ -34,13 +30,6 @@ model_path = os.environ.get(
     os.path.join(os.path.dirname(__file__), "data", "model.sdgr.joblib"),
 )
 mvect, model = joblib.load(model_path)
-
-# model_path = os.environ.get(
-#     "WEBAPP_MODEL_PATH",
-#     os.path.join(os.path.dirname(__file__), "data", "model.sdgr.pkl"),
-# )
-# mvect, model = pickle.load(model_path)
-
 
 ua = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
