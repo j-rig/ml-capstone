@@ -21,7 +21,7 @@ from werkzeug.exceptions import HTTPException
 from flask_bootstrap import Bootstrap
 
 
-from bizwiz.pipeline import pipeline, predict_funcs
+from bizwiz.pipeline import pipeline, predict_funcs, listing_funcs
 
 locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
@@ -141,6 +141,16 @@ def home():
 @app.route("/dash", methods=["GET", "POST"])
 def dash():
     check_uuid()
+    listings = []
+    if "listings" not in session:
+        o = pipeline(dict(), listing_funcs)
+        if "error" not in o.keys():
+            session["listings"] = o["listings"]
+    else:
+        listings = session["listings"]
+    js_listings = [f"'{x}'" for x in listings]
+    js_listings = ",\n".join(js_listings)
+    js_listings = f"const listings=[{js_listings}];"
     form = BizBuySellUrlForm()
     if form.validate_on_submit():
         pred = Prediction()
@@ -162,7 +172,9 @@ def dash():
         .all()
     )
     pll = [json.loads(p.json) for p in pl]
-    return render_template("dash.html", form=form, pl=pll, as_dollar=as_dollar)
+    return render_template(
+        "dash.html", form=form, pl=pll, as_dollar=as_dollar, listings=js_listings
+    )
 
 
 # TODO

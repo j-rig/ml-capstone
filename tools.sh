@@ -22,7 +22,7 @@ lint_it(){
 
 test_it(){
   echo "testing...";
-  PYTHONPATH="$PWD/test" pytest test;
+  PYTHONPATH="$PWD/test" pytest test -o log_cli=true -o log_cli_level="INFO";
 }
 
 build_notebook(){

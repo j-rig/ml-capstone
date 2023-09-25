@@ -5,9 +5,16 @@
 {% block content %}
 
   <h1>Dash</h1>
+
+  <div class="col mb-4">
+    <button type="button" class="btn btn-secondary" onclick="get_random_listing()">Random Url</button>
+</div>
+
 <div class="row row-cols-1">
   <div class="col mb-4">
-      {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+      {{ wtf.quick_form(form, button_map={'submit_button': 'primary'},id='the_form') }}
+
+
 </div>
 </div>
       <div class="row row-cols-1 row-cols-md-2">
@@ -61,4 +68,22 @@
       {% endfor %}
 
       </div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  {{listings|safe}}
+
+  function get_random (list) {
+    return list[Math.floor((Math.random()*list.length))];
+  }
+
+  function get_random_listing () {
+    result=get_random(listings);
+    console.log(result);
+    document.getElementById('url').setAttribute('value',result);
+    return result;
+  }
+</script>
 {% endblock %}

@@ -21,19 +21,38 @@ def test_joblib_version():
     assert joblib.__version__ == "1.1.0"
 
 
+def get_page_nodf(o):
+    o["scratch"]["page"] = open(
+        os.path.join(os.path.dirname(__file__), "data", "bbs_listing_nocf.html")
+    ).read()
+    return True, o
+
+
 def test_predict_pipeline():
     url = "https://www.bizbuysell.com/Business-Opportunity/Wholesale-Distributor-of-Auto-and-Marine-Upholstery-Supplies/2093773/"
-
-    def get_page_nodf(o):
-        o["scratch"]["page"] = open(
-            os.path.join(os.path.dirname(__file__), "bbs_listing_nocf.html")
-        ).read()
-        return True, o
-
     predict_funcs[1] = get_page_nodf
     r = pipeline(dict(url=url), predict_funcs)
+    assert "error" not in r.keys()
+    assert "pprice" in r.keys()
 
 
-# def test_listing_pipeline():
-#     # predict_funcs[1] = pl_ok
-#     r = pipeline(dict(url=""), listing_funcs)
+def test_predict_pipeline_bad_url():
+    url = "https://www.bizbuysell.com/bad_url"
+    predict_funcs[1] = get_page_nodf
+    r = pipeline(dict(url=url), predict_funcs)
+    assert "error" in r.keys()
+    assert r["error"]["code"] == 1
+
+
+def get_listings(o):
+    o["scratch"]["page"] = open(
+        os.path.join(os.path.dirname(__file__), "data", "bbs_search.html")
+    ).read()
+    return True, o
+
+
+def test_listing_pipeline():
+    listing_funcs[1] = get_listings
+    r = pipeline(dict(url=""), listing_funcs)
+    assert "error" not in r.keys()
+    assert "listings" in r.keys()

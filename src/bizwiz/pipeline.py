@@ -237,7 +237,37 @@ predict_funcs = [
     predict_price,
 ]
 
-listing_funcs = []
+
+def set_listings_url(o):
+    logger.info("setting listings url")
+    o["scratch"] = dict()
+    o["url"] = "https://www.bizbuysell.com/businesses-for-sale"
+    return True, o
+
+
+def extract_listings(o):
+    logger.info("extracting listings")
+    o["listings"] = list()
+    if "json-ld" in o["scratch"]["metadata"].keys():
+        for i in o["scratch"]["metadata"]["json-ld"]:
+            if i["@type"] == "SearchResultsPage":
+                for j in i["about"]:
+                    if j["@type"] == "ListItem":
+                        url = "https://www.bizbuysell.com" + j["item"]["url"]
+                        if url.startswith(base_url):
+                            o["listings"].append(url)
+    if len(o["listings"]):
+        return True, o
+    o["error"] = dict(code=7, message="failed get listings", data="")
+    return False, o
+
+
+listing_funcs = [
+    set_listings_url,
+    get_page,
+    get_metadata,
+    extract_listings,
+]
 
 
 def pipeline(o, l):
