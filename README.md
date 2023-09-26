@@ -43,6 +43,23 @@ When the python package is installed, the "bizwiz" cli will be available.
 
   bizwiz --help
 
+## REST Price Prediction API
+
+### example payload.json
+
+<code>
+{  "url": "https://www.bizbuysell.com/Business-Opportunity/high-profit-passive-income-fitness-center/2153710" }
+</code>
+
+### example curl command
+
+<code>
+curl -XPOST
+-d @/path/to/payload.json
+-H "Content-Type:application/json"
+http://localhost:5000/api/bizbuysell/url
+</code>
+
 ## Features
 
 * Predicts the price of a business listed on BuizBuySell using NLP.
