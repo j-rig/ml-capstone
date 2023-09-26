@@ -16,6 +16,18 @@ To build the package, clone the repository and run the following command:
 
   cd src/; python setup.py sdist;
 
+### Installing the Python Package
+
+To install the package, run the following command:
+
+  cd src/sdist; pip install bizwiz-0.0.1.tar.gz;
+
+### Testing the Python Package
+
+To test the package, run the following command:
+
+  pytest test;      
+
 ### Docker Compose
 
 To run the project using Docker Compose use the following command:
