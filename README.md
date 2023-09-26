@@ -1,13 +1,36 @@
 # ML-Capstone Project (BizWiz)
 
-## Project title and description
+This project aims to develop a machine learning model to predict the price of a business listing using natural language processing (NLP). The model is trained on a dataset of business listings, financial data, and industry information.
 
-## Installation and usage instructions
+The project is implemented as a web application with an REST API that can be used by other applications to integrate the price prediction functionality.
+
+## Installation and Usage Instructions
+
+### Build Environment
+
+This project is developed with Mac/Linux, Docker, and Python 3.9.
+
+### Building the Python Package
+
+To build the package, clone the repository and run the following command:
+
+  cd src/; python setup.py sdist;
+
+### Docker Compose
+
+To run the project using Docker Compose use the following command:
+
+  docker-compose up
+
+This will start the Docker containers needed to run the web application and service.
+The web application is avaliable at http://localhost:5000 and the REST API is available at http://localhost:5000/api/bizbuysell/url.
+
+### Command line
+
+When the python package is installed, the "bizwiz" cli will be available.
+
+  bizwiz --help
 
 ## Features
 
-## Contributing guidelines
-
-## License
-
-## Credits
+* Predicts the price of a business listed on BuizBuySell using NLP.

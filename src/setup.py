@@ -17,6 +17,7 @@ setup(
             "static/*.jpg",
             "static/*.css",
             "static/*.js",
+            "static/*.gif",
             "templates/*.html",
         ]
     },
