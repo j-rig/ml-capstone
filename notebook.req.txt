@@ -6,6 +6,7 @@ fastparquet
 h3
 nltk==3.6.7
 scikit-learn==1.0.2
-fastai
+#fastai
 joblib==1.1.0
 xlrd
+scipy==1.7.3

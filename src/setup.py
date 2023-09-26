@@ -11,6 +11,15 @@ setup(
     author_email="jrighetti@alumni.ucsd.edu",
     packages=find_packages(),
     package_dir={"bizwiz": "bizwiz"},
+    package_data={
+        "bizwiz": [
+            "data/*.joblib",
+            "static/*.jpg",
+            "static/*.css",
+            "static/*.js",
+            "templates/*.html",
+        ]
+    },
     install_requires=[
         "click",
         "requests",
@@ -28,6 +37,7 @@ setup(
         "extruct",
         "python-dotenv",
         "email_validator",
+        "scipy==1.7.3",
     ],
     entry_points={"console_scripts": ["bizwiz = bizwiz.cli:main"]},
     dependency_links=[],
