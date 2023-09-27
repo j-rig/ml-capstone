@@ -34,7 +34,8 @@ run_notebook(){
   docker run -p 8888:8888 \
     --mount type=bind,source="$(pwd)"/ml-capstone,target=/app \
     ml-capstone-notebook \
-    jupyter notebook --allow-root --ip 0.0.0.0;
+    jupyter notebook --allow-root --ip 0.0.0.0 \
+      --NotebookApp.max_buffer_size=1000000000;
   cd ml-capstone;
 }
 

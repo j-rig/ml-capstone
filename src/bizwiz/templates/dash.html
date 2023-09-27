@@ -4,86 +4,151 @@
 
 {% block content %}
 
-  <h1>Dash</h1>
+<h1>Dash</h1>
 
-  <div class="col mb-4">
-    <button type="button" class="btn btn-secondary" onclick="get_random_listing()">Random Url</button>
+<div class="col mb-4">
+  <button type="button" class="btn btn-secondary" onclick="get_random_listing()">Random Url</button>
 </div>
 
 <div class="row row-cols-1">
   <div class="col mb-4">
-      {{ wtf.quick_form(form, button_map={'submit_button': 'primary'},id='the_form') }}
+    {{ wtf.quick_form(form, button_map={'submit_button': 'primary'},id='the_form') }}
 
 
+  </div>
 </div>
-</div>
-      <div class="row row-cols-1 row-cols-md-2">
+<div class="row row-cols-1 row-cols-md-2">
 
 
-      {% for p in pl %}
+  {% for p in pl %}
 
-      {% if 'error' in p %}
-<div class="col mb-4">
-      <div class="card" >
-        <div class="card-body">
-          <h5 class="card-title">Error</h5>
-          <h6 class="card-subtitle mb-2 text-muted">{{ p.url}}</h6>
+  {% if 'error' in p %}
+  <div class="col mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Error</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ p.url}}</h6>
 
-          <ul class="list-group">
-            <li class="list-group-item list-group-item-warning">{{ p.error.message }}</li>
-          </ul>
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-warning">{{ p.error.message }}</li>
+        </ul>
 
-        </div>
       </div>
     </div>
+  </div>
 
-      {%- else %}
+  {%- else %}
 
-      <div class="col mb-4">
+  <div class="col mb-4">
 
-      <div class="card" >
-        {% if 'image' in p and p.image %}
-         <img class="card-img-top" src="{{ p.image }}" alt="Card image cap">
-         {% endif %}
-        <div class="card-body">
-          <h5 class="card-title">{{ p.title}}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">{{ p.url}}</h6>
-          <ul class="list-group">
-            <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
-            <li class="list-group-item">Model Price: {{ as_dollar(p.pprice) }}</li>
-            <li class="list-group-item">Predictive N-grams:
-              {% for w in p.pwords %}
-                <button type="button" class="btn btn-outline-info btn-sm">{{ w }}</button>
-              {% endfor %}
-            </li>
-          </ul>
-          <a href="{{ p.url }}" class="card-link" target=”_blank”>{{ p.id }}</a>
-        </div>
-      </div>
-
-    </div>
-
+    <div class="card">
+      {% if 'image' in p and p.image %}
+      <img class="card-img-top" src="{{ p.image }}" alt="Card image cap">
       {% endif %}
-
-      {% endfor %}
+      <div class="card-body">
+        <h5 class="card-title">{{ p.title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ p.url}}</h6>
+        <ul class="list-group">
+          <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
+          <li class="list-group-item">Model Price: {{ as_dollar(p.pprice) }}</li>
+          <li class="list-group-item">Predictive N-grams:
+            {% for w in p.pwords %}
+            <button type="button" class="btn btn-outline-info btn-sm">{{ w }}</button>
+            {% endfor %}
+          </li>
+          <!-- <li class="list-group-item">
+          <canvas id="chart_{{ p.id }}" height="500"></canvas>
+          </li> -->
+        </ul>
+        <a href="{{ p.url }}" class="card-link" target=”_blank”>{{ p.id }}</a>
 
       </div>
+    </div>
+
+  </div>
+
+  {% endif %}
+
+  {% endfor %}
+
+</div>
 
 {% endblock %}
 
 {% block script %}
+
 <script>
-  {{listings|safe}}
 
-  function get_random (list) {
-    return list[Math.floor((Math.random()*list.length))];
+  {{ listings | safe }}
+
+  function get_random(list) {
+    return list[Math.floor((Math.random() * list.length))];
   }
 
-  function get_random_listing () {
-    result=get_random(listings);
+  function get_random_listing() {
+    result = get_random(listings);
+    if (result === undefined) {
+      console.log('listing undefined, refreshing page');
+      location.reload();
+    }
     console.log(result);
-    document.getElementById('url').setAttribute('value',result);
-    return result;
+    document.getElementById('url').setAttribute('value', result);
   }
+
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+  integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+  crossorigin="anonymous"></script>
+
+
+  {% for p in pl %}
+
+  {% if 'error' not in p %}
+
+<script>
+
+// new Chart(
+//   document.getElementById('chart_{{ p.id }}'),
+//   {
+//     type: 'bar',
+//
+//     data: {
+//
+//       labels: [
+//       {% for w in p.pwords %}
+//       '{{ w }}',
+//       {% endfor %}
+//       ],
+//
+//       datasets: [{
+//         data: [
+//         {% for i in p.pwi %}
+//         {{ i }},
+//         {% endfor %}
+//         ]
+//       }]
+//     },
+//     options: {
+//       indexAxis: 'y',
+//       responsive: true,
+//       plugins: {
+//         title: {
+//          display: true,
+//          text: 'Predictive N-grams'
+//        },
+//        legend: {
+//         display: false
+//       }
+//      }
+// }
+//   }
+// );
+
+</script>
+
+  {% endif %}
+
+  {% endfor %}
+
 {% endblock %}
