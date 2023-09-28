@@ -79,20 +79,23 @@
 
 <script>
 
-  {{ listings | safe }}
-
-  function get_random(list) {
-    return list[Math.floor((Math.random() * list.length))];
-  }
 
   function get_random_listing() {
-    result = get_random(listings);
+
+    {{ listings | safe }}
+
+    idx= Math.floor(Math.random() * listings.length);
+
+    result=listings[idx];
+
     if (result === undefined) {
-      console.log('listing undefined, refreshing page');
+      // console.log('listings undefined, refreshing page');
       location.reload();
     }
-    console.log(result);
+
+    // console.log(result);
     document.getElementById('url').setAttribute('value', result);
+
   }
 
 </script>

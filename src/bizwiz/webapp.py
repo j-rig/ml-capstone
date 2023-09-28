@@ -150,7 +150,7 @@ def dash():
         listings = session["listings"]
     js_listings = [f"'{x}'" for x in listings]
     js_listings = ",\n".join(js_listings)
-    js_listings = f"const listings=[{js_listings}];"
+    js_listings = f"listings=[{js_listings}];"
     form = BizBuySellUrlForm()
     if form.validate_on_submit():
         pred = Prediction()
