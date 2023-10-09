@@ -39,7 +39,7 @@ model_path = os.environ.get(
     "WEBAPP_MODEL_PATH",
     os.path.join(os.path.dirname(__file__), "data", "model.final.joblib"),
 )
-vect_text, model_text, model_feature = joblib.load(model_path)
+vect_text, model_text, model_gr_text, model_cf_gr_text = joblib.load(model_path)
 
 ua = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
@@ -275,7 +275,7 @@ def predict_price(o):
     o["pwi"] = [float(x) for x in importance[:20]]
 
     if o["cash_flow"] != None and o["gross_revenue"] != None:
-        Xf = pd.DataFrame(
+        X = pd.DataFrame(
             {
                 "cash_flow": [
                     o["cash_flow"],
@@ -283,17 +283,30 @@ def predict_price(o):
                 "gross_revenue": [
                     o["gross_revenue"],
                 ],
+                "text_price": [
+                    o["ppricet"],
+                ],
             }
         )
-        yftest = model_feature.predict(Xf)
-        o["pprice"] = yftest[0]
-        o["ppricef"] = yftest[0]
-        o["model"] = "feature"
-
-        if o["pprice"] > o["ppricef"] * Q[0] and o["pprice"] < o["ppricef"] * Q[1]:
-            w = 0.6
-            o["pprice"] = w * o["ppricef"] + (1.0 - w) * o["ppricet"]
-            o["model"] = "text+feature"
+        ytest = model_cf_gr_text.predict(X)
+        o["pprice"] = ytest[0]
+        o["ppricecfgrt"] = ytest[0]
+        o["model"] = "text + cash flow + gross revenue"
+    elif o["gross_revenue"] != None:
+        X = pd.DataFrame(
+            {
+                "gross_revenue": [
+                    o["gross_revenue"],
+                ],
+                "text_price": [
+                    o["ppricet"],
+                ],
+            }
+        )
+        ytest = model_gr_text.predict(X)
+        o["pprice"] = ytest[0]
+        o["ppricegrt"] = ytest[0]
+        o["model"] = "text + gross revenue"
 
     if o["pprice"] < 0:
         o["error"] = dict(code=99, message="negative price prediction", data="")

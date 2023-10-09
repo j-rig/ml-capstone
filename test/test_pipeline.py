@@ -54,7 +54,7 @@ def test_predict_pipeline_cashflow():
     assert "error" not in r.keys()
     assert "pprice" in r.keys()
     assert "model" in r.keys()
-    assert "text+feature" == r["model"]
+    assert "text + cash flow + gross revenue" == r["model"]
 
 
 def test_predict_pipeline_bad_url():

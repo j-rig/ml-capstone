@@ -24,10 +24,13 @@
   {% if 'gross_revenue' in p and p.gross_revenue %}
   <li class="list-group-item">Gross Revenue: {{ as_dollar( p.gross_revenue) }}</li>
   {% endif %}
-  {% if 'ppricef' in p and p.ppricef %}
+  <!-- {% if 'ppricef' in p and p.ppricef %}
   <li class="list-group-item">Feature Model Price: {{ as_dollar(p.ppricef) }}</li>
-  {% endif %}
+  {% endif %} -->
   <li class="list-group-item">Model: {{ p.model }}</li>
+  <li class="list-group-item">
+  <canvas id="price"></canvas>
+  </li>
   <li class="list-group-item">
   <canvas id="pageinfo"></canvas>
   </li>
@@ -45,6 +48,42 @@
   crossorigin="anonymous"></script>
 
   <script>
+
+
+    new Chart(
+      document.getElementById('price'),
+      {
+        type: 'bar',
+
+        data: {
+
+          labels: [
+          'asking', 'model','model text'
+          ],
+
+          datasets: [{
+            data: [
+            {{ p.price }},
+            {{ p.pprice }},
+            {{ p.ppricet }}
+            ]
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: {
+            title: {
+             display: true,
+             text: 'Price'
+           },
+           legend: {
+            display: false
+          }
+         }
+    }
+      }
+    );
 
   new Chart(
     document.getElementById('ngrams'),

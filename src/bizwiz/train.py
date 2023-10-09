@@ -39,6 +39,8 @@ def train(df, model_path):
     regr = SGDRegressor()
     regr.fit(X_text, df.price)
 
+    # TODO FIXME
+
     logger.info("training feature model...")
     regrf = GradientBoostingRegressor()
     Xf_train = df[["cash_flow", "gross_revenue"]]
