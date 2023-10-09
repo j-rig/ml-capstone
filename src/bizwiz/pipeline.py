@@ -201,6 +201,7 @@ def extract_details(o):
 def extract_finanicals(o):
     logger.info("getting finanicals")
     o["finanicals"] = ""
+    # TODO
     return True, o
 
 
@@ -231,12 +232,14 @@ def process_finanicals(o):
 def extract_cash_flow(o):
     logger.info("processing cash flow")
     o["cash_flow"] = None
+    # TODO
     return True, o
 
 
 def extract_gross_revenue(o):
     logger.info("processing gross revenue")
     o["gross_revenue"] = None
+    # TODO
     return True, o
 
 
@@ -245,10 +248,10 @@ def predict_price(o):
     docs = [
         o["ptitle"] + " " + o["pdesc"] + " " + o["pdetails"] + " " + o["pfinanicals"]
     ]
-    Xtest = mvect.transform(docs)
+    Xtest = vect_text.transform(docs)
     # print(Xtest)
     importance = np.argsort(np.asarray(Xtest.sum(axis=0)).ravel())[::-1]
-    feature_names = np.array(mvect.get_feature_names_out())
+    feature_names = np.array(vect_text.get_feature_names_out())
     # print(Xtest[importance[:20]])
     ytest = model_text.predict(Xtest)
     o["pprice"] = ytest[0]
