@@ -10,7 +10,15 @@ logger = logging.getLogger(__name__)
 
 def train(df, model_path):
     logger.info("checking dataframe...")
-    columns = ["pptitle", "ppdesc", "ppdetails", "ppfinancials", "price"]
+    columns = [
+        "pptitle",
+        "ppdesc",
+        "ppdetails",
+        "ppfinancials",
+        "price",
+        "cash_flow",
+        "gross_revenue",
+    ]
     assert columns in df.columns
     logger.info("vectorizing text...")
     vect_text = TfidfVectorizer(
