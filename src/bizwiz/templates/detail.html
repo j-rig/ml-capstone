@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Dash{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Details For Listing {{ p.id }}</h1>
+<ul class="list-group">
+  {% if 'image' in p and p.image %}
+  <li class="list-group-item">
+<img src="{{ p.image }}" >
+</li>
+{% endif %}
+<li class="list-group-item">Listing Id: {{ p.id }}</li>
+  <li class="list-group-item">Title: {{ p.title }}</li>
+  <li class="list-group-item">Url: <a href="{{ p.url }}" class="card-link" target=”_blank”>{{ p.url }}</a></li>
+  <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
+  <li class="list-group-item">Model Price: {{ as_dollar(p.pprice) }}</li>
+  <li class="list-group-item">Text Model Price: {{ as_dollar(p.ppricet) }}</li>
+  {% if 'cash_flow' in p and p.cash_flow %}
+  <li class="list-group-item">Cash Flow: {{ as_dollar( p.cash_flow) }}</li>
+  {% endif %}
+  {% if 'gross_revenue' in p and p.gross_revenue %}
+  <li class="list-group-item">Gross Revenue: {{ as_dollar( p.gross_revenue) }}</li>
+  {% endif %}
+  {% if 'ppricef' in p and p.ppricef %}
+  <li class="list-group-item">Feature Model Price: {{ as_dollar(p.ppricef) }}</li>
+  {% endif %}
+  <li class="list-group-item">Model: {{ p.model }}</li>
+  <li class="list-group-item">
+  <canvas id="pageinfo"></canvas>
+  </li>
+  <li class="list-group-item">
+  <canvas id="ngrams" height="500"></canvas>
+  </li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+  integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+  crossorigin="anonymous"></script>
+
+  <script>
+
+  new Chart(
+    document.getElementById('ngrams'),
+    {
+      type: 'bar',
+
+      data: {
+
+        labels: [
+        {% for w in p.pwords %}
+        '{{ w }}',
+        {% endfor %}
+        ],
+
+        datasets: [{
+          data: [
+          {% for i in p.pwi %}
+          {{ i }},
+          {% endfor %}
+          ]
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          title: {
+           display: true,
+           text: 'Page Predictive N-grams'
+         },
+         legend: {
+          display: false
+        }
+       }
+  }
+    }
+  );
+
+
+  new Chart(
+    document.getElementById('pageinfo'),
+    {
+      // type: 'bar',
+
+     type:  'doughnut',
+
+      data: {
+
+        labels: [ 'tile', 'description', 'details', 'financials'],
+
+        datasets: [{
+          data: [
+        {{p.title|length}},{{p.desc|length}},{{p.details|length}},{{p.finanicals|length}}
+          ]
+        }]
+      },
+      options: {
+        // indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          title: {
+           display: true,
+           text: 'Page Section Size (bytes)'
+         },
+        //  legend: {
+        //   display: false
+        // }
+       }
+  }
+    }
+  );
+
+
+  </script>
+
+{% endblock %}

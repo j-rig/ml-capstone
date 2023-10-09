@@ -51,21 +51,27 @@
         <ul class="list-group">
           <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
           <li class="list-group-item">Model Price: {{ as_dollar(p.pprice) }}</li>
-          <li class="list-group-item">Predictive N-grams:
+          <!-- <li class="list-group-item">Predictive N-grams:
             {% for w in p.pwords %}
             <button type="button" class="btn btn-outline-info btn-sm">{{ w }}</button>
             {% endfor %}
-          </li>
+          </li> -->
           <!-- <li class="list-group-item">
           <canvas id="chart_{{ p.id }}" height="500"></canvas>
           </li> -->
+
+          <!-- <li class="list-group-item">Model: {{ p.model }}</li> -->
+
         </ul>
+        <a href="{{ url_for('detail', page_id=p.hurl) }}" class="card-link">model details</a>
         <a href="{{ p.url }}" class="card-link" target=”_blank”>{{ p.id }}</a>
 
       </div>
     </div>
 
   </div>
+
+
 
   {% endif %}
 
@@ -100,9 +106,9 @@
 
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
   integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
-  crossorigin="anonymous"></script>
+  crossorigin="anonymous"></script> -->
 
 
   {% for p in pl %}

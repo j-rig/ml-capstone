@@ -4,6 +4,7 @@ import datetime
 import json
 import os
 import locale
+import hashlib
 
 from flask_wtf import FlaskForm as Form
 from wtforms import StringField, SubmitField
@@ -51,6 +52,7 @@ class Prediction(db.Model):
     ts = db.Column(db.DateTime)
     uuid = db.Column(db.String())
     url = db.Column(db.String())
+    hurl = db.Column(db.String())
     visible = db.Column(db.Boolean)
     json = db.Column(db.String())
 
@@ -138,6 +140,17 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/detail/<page_id>")
+def detail(page_id):
+    pl = (
+        Prediction.query.filter_by(uuid=session["uuid"], visible=True, hurl=page_id)
+        .limit(1)
+        .all()
+    )
+    p = [json.loads(p.json) for p in pl][0]
+    return render_template("detail.html", p=p, as_dollar=as_dollar)
+
+
 @app.route("/dash", methods=["GET", "POST"])
 def dash():
     check_uuid()
@@ -158,8 +171,11 @@ def dash():
         pred.ip = request.remote_addr
         pred.uuid = session["uuid"]
         pred.url = form.url.data
+        h = hashlib.new("sha256")
+        h.update(form.url.data.encode())
+        pred.hurl = h.hexdigest()
         pred.visible = True
-        result = pipeline(dict(url=form.url.data), predict_funcs)
+        result = pipeline(dict(url=pred.url, hurl=pred.hurl), predict_funcs)
         del result["scratch"]
         pred.json = json.dumps(result)
         db.session.add(pred)

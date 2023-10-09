@@ -8,6 +8,8 @@ import logging
 import json
 import os.path
 import numpy as np
+import re
+import pandas as pd
 
 import joblib
 import extruct
@@ -201,7 +203,10 @@ def extract_details(o):
 def extract_finanicals(o):
     logger.info("getting finanicals")
     o["finanicals"] = ""
-    # TODO
+    pc = o["scratch"]["soup"].find("div", {"class": "pageContent"})
+    fin = pc.find("div", {"class": "financials"})
+    if fin is not None:
+        o["finanicals"] = fin.text.strip()
     return True, o
 
 
@@ -232,14 +237,22 @@ def process_finanicals(o):
 def extract_cash_flow(o):
     logger.info("processing cash flow")
     o["cash_flow"] = None
-    # TODO
+    r = re.search("[cC]ash\s+[fF]low:\s+\$?(\d[\d,]*)", o["finanicals"])
+    if r is not None:
+        r = r.groups()[0]
+        r = r.replace(",", "")
+        o["cash_flow"] = int(r)
     return True, o
 
 
 def extract_gross_revenue(o):
     logger.info("processing gross revenue")
     o["gross_revenue"] = None
-    # TODO
+    r = re.search("[gG]ross\s+[rR]evenue:\s+\$?(\d[\d,]*)", o["finanicals"])
+    if r is not None:
+        r = r.groups()[0]
+        r = r.replace(",", "")
+        o["gross_revenue"] = int(r)
     return True, o
 
 
@@ -274,11 +287,12 @@ def predict_price(o):
         )
         yftest = model_feature.predict(Xf)
         o["pprice"] = yftest[0]
-        o["pprice_f"] = yftest[0]
+        o["ppricef"] = yftest[0]
         o["model"] = "feature"
 
-        if o["pprice"] > o["pprice_f"] * Q[0] and o["pprice"] < o["pprice_f"] * Q[1]:
-            o["pprice"] = (o["pprice"] + o["pprice_f"]) / 2.0
+        if o["pprice"] > o["ppricef"] * Q[0] and o["pprice"] < o["ppricef"] * Q[1]:
+            w = 0.6
+            o["pprice"] = w * o["ppricef"] + (1.0 - w) * o["ppricet"]
             o["model"] = "text+feature"
 
     if o["pprice"] < 0:
