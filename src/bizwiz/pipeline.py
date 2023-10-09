@@ -25,11 +25,19 @@ logger = logging.getLogger(__name__)
 nltk.download("punkt")
 nltk.download("stopwords")
 
+# model_path = os.environ.get(
+#     "WEBAPP_MODEL_PATH",
+#     os.path.join(os.path.dirname(__file__), "data", "model.sdgr.joblib"),
+# )
+
+
+Q = [0.8, 1.2]
+
 model_path = os.environ.get(
     "WEBAPP_MODEL_PATH",
-    os.path.join(os.path.dirname(__file__), "data", "model.sdgr.joblib"),
+    os.path.join(os.path.dirname(__file__), "data", "model.final.joblib"),
 )
-mvect, model = joblib.load(model_path)
+vect_text, model_text, model_feature = joblib.load(model_path)
 
 ua = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
@@ -190,6 +198,12 @@ def extract_details(o):
     return True, o
 
 
+def extract_finanicals(o):
+    logger.info("getting finanicals")
+    o["finanicals"] = ""
+    return True, o
+
+
 def process_title(o):
     logger.info("processing title")
     o["ptitle"] = preprocess_text(o["title"])
@@ -208,18 +222,66 @@ def process_details(o):
     return True, o
 
 
+def process_finanicals(o):
+    logger.info("processing finanicals")
+    o["pfinanicals"] = preprocess_text(o["finanicals"])
+    return True, o
+
+
+def extract_cash_flow(o):
+    logger.info("processing cash flow")
+    o["cash_flow"] = None
+    return True, o
+
+
+def extract_gross_revenue(o):
+    logger.info("processing gross revenue")
+    o["gross_revenue"] = None
+    return True, o
+
+
 def predict_price(o):
     logger.info("predicting price")
-    docs = [o["ptitle"] + " " + o["pdesc"] + " " + o["pdetails"]]
+    docs = [
+        o["ptitle"] + " " + o["pdesc"] + " " + o["pdetails"] + " " + o["pfinanicals"]
+    ]
     Xtest = mvect.transform(docs)
     # print(Xtest)
     importance = np.argsort(np.asarray(Xtest.sum(axis=0)).ravel())[::-1]
     feature_names = np.array(mvect.get_feature_names_out())
     # print(Xtest[importance[:20]])
-    ytest = model.predict(Xtest)
+    ytest = model_text.predict(Xtest)
     o["pprice"] = ytest[0]
+    o["ppricet"] = ytest[0]
+    o["model"] = "text"
+
     o["pwords"] = [str(x) for x in feature_names[importance[:20]]]
     o["pwi"] = [float(x) for x in importance[:20]]
+
+    if o["cash_flow"] != None and o["gross_revenue"] != None:
+        Xf = pd.DataFrame(
+            {
+                "cash_flow": [
+                    o["cash_flow"],
+                ],
+                "gross_revenue": [
+                    o["gross_revenue"],
+                ],
+            }
+        )
+        yftest = model_feature.predict(Xf)
+        o["pprice"] = yftest[0]
+        o["pprice_f"] = yftest[0]
+        o["model"] = "feature"
+
+        if o["pprice"] > o["pprice_f"] * Q[0] and o["pprice"] < o["pprice_f"] * Q[1]:
+            o["pprice"] = (o["pprice"] + o["pprice_f"]) / 2.0
+            o["model"] = "text+feature"
+
+    if o["pprice"] < 0:
+        o["error"] = dict(code=99, message="negative price prediction", data="")
+        return False, o
+
     return True, o
 
 
@@ -237,6 +299,10 @@ predict_funcs = [
     extract_image,
     extract_details,
     process_details,
+    extract_finanicals,
+    process_finanicals,
+    extract_cash_flow,
+    extract_gross_revenue,
     predict_price,
 ]
 

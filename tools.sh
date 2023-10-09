@@ -39,6 +39,14 @@ run_notebook(){
   cd ml-capstone;
 }
 
+run_spark_notebook(){
+  cd ../;
+  docker run -p 8888:8888 \
+    --mount type=bind,source="$(pwd)"/ml-capstone,target=/home/jovyan/app \
+    jupyter/pyspark-notebook;
+  cd ml-capstone;
+}
+
 d_test_it(){
   cd ../;
   docker run \
