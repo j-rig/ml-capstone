@@ -266,13 +266,26 @@ def predict_price(o):
     importance = np.argsort(np.asarray(Xtest.sum(axis=0)).ravel())[::-1]
     feature_names = np.array(vect_text.get_feature_names_out())
     # print(Xtest[importance[:20]])
+    o["pwords"] = [str(x) for x in feature_names[importance[:20]]]
+    o["pwi"] = [float(x) for x in importance[:20]]
+
+    # get the first vector out (for the first document)
+    first_vector_tfidfvectorizer = Xtest[0]
+    # place tf-idf values in a pandas data frame
+    tfidf_df = pd.DataFrame(
+        first_vector_tfidfvectorizer.T.todense(),
+        index=vect_text.get_feature_names_out(),
+        columns=["tfidf"],
+    )
+    tfidf_df = tfidf_df.sort_values(by=["tfidf"], ascending=False)
+    tfidf_df = tfidf_df.head(20)
+    o["tfidf_words"] = list(tfidf_df.index)
+    o["tfidf"] = list(tfidf_df.tfidf)
+
     ytest = model_text.predict(Xtest)
     o["pprice"] = ytest[0]
     o["ppricet"] = ytest[0]
     o["model"] = "text"
-
-    o["pwords"] = [str(x) for x in feature_names[importance[:20]]]
-    o["pwi"] = [float(x) for x in importance[:20]]
 
     if o["cash_flow"] != None and o["gross_revenue"] != None:
         X = pd.DataFrame(

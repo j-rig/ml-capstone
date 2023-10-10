@@ -39,6 +39,7 @@ setup(
         "python-dotenv",
         "email_validator",
         "scipy==1.7.3",
+        "fastparquet",
     ],
     entry_points={"console_scripts": ["bizwiz = bizwiz.cli:main"]},
     dependency_links=[],

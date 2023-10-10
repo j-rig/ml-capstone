@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}Dash{% endblock %}
+{% block title %}Details For Listing {{ p.id }}{% endblock %}
 
 {% block content %}
 
@@ -9,13 +9,13 @@
 <ul class="list-group">
   {% if 'image' in p and p.image %}
   <li class="list-group-item">
-<img src="{{ p.image }}" >
+<img class="card-img-top" src="{{ p.image }}" >
 </li>
 {% endif %}
-<li class="list-group-item">Listing Id: {{ p.id }}</li>
+<!-- <li class="list-group-item">Listing Id: {{ p.id }}</li> -->
   <li class="list-group-item">Title: {{ p.title }}</li>
-  <li class="list-group-item">Url: <a href="{{ p.url }}" class="card-link" target=”_blank”>{{ p.url }}</a></li>
-  <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
+  <li class="list-group-item">Url: <a href="{{ p.url }}" target=”_blank”>{{ p.url }}</a></li>
+  <!-- <li class="list-group-item">Asking Price: {{ as_dollar(p.price) }}</li>
   <li class="list-group-item">Model Price: {{ as_dollar(p.pprice) }}</li>
   <li class="list-group-item">Text Model Price: {{ as_dollar(p.ppricet) }}</li>
   {% if 'cash_flow' in p and p.cash_flow %}
@@ -23,13 +23,13 @@
   {% endif %}
   {% if 'gross_revenue' in p and p.gross_revenue %}
   <li class="list-group-item">Gross Revenue: {{ as_dollar( p.gross_revenue) }}</li>
-  {% endif %}
+  {% endif %} -->
   <!-- {% if 'ppricef' in p and p.ppricef %}
   <li class="list-group-item">Feature Model Price: {{ as_dollar(p.ppricef) }}</li>
   {% endif %} -->
-  <li class="list-group-item">Model: {{ p.model }}</li>
+  <li class="list-group-item">Predictive Model: {{ p.model }}</li>
   <li class="list-group-item">
-  <canvas id="price"></canvas>
+  <canvas id="price" height="200"></canvas>
   </li>
   <li class="list-group-item">
   <canvas id="pageinfo"></canvas>
@@ -58,14 +58,26 @@
         data: {
 
           labels: [
-          'asking', 'model','model text'
+          'asking price', 'model price','text model price',
+          {% if 'cash_flow' in p and p.cash_flow %}
+          'cash flow',
+          {% endif %}
+          {% if 'gross_revenue' in p and p.gross_revenue %}
+          'gross revenue',
+          {% endif %}
           ],
 
           datasets: [{
             data: [
             {{ p.price }},
             {{ p.pprice }},
-            {{ p.ppricet }}
+            {{ p.ppricet }},
+            {% if 'cash_flow' in p and p.cash_flow %}
+            {{ p.cash_flow }},
+            {% endif %}
+            {% if 'gross_revenue' in p and p.gross_revenue %}
+            {{ p.gross_revenue }},
+            {% endif %}
             ]
           }]
         },
@@ -75,7 +87,7 @@
           plugins: {
             title: {
              display: true,
-             text: 'Price'
+             text: 'Financials'
            },
            legend: {
             display: false
@@ -93,14 +105,14 @@
       data: {
 
         labels: [
-        {% for w in p.pwords %}
+        {% for w in p.tfidf_words %}
         '{{ w }}',
         {% endfor %}
         ],
 
         datasets: [{
           data: [
-          {% for i in p.pwi %}
+          {% for i in p.tfidf %}
           {{ i }},
           {% endfor %}
           ]
@@ -112,7 +124,7 @@
         plugins: {
           title: {
            display: true,
-           text: 'Page Predictive N-grams'
+           text: 'Listing Top TF-IDF Scores'
          },
          legend: {
           display: false
@@ -146,7 +158,7 @@
         plugins: {
           title: {
            display: true,
-           text: 'Page Section Size (bytes)'
+           text: 'Listing Section Size (bytes)'
          },
         //  legend: {
         //   display: false

@@ -6,6 +6,9 @@ import joblib
 import os.path
 
 from bizwiz.pipeline import pipeline, predict_funcs, listing_funcs
+from bizwiz.train import train
+
+import pandas as pd
 
 
 def pl_ok(o):
@@ -77,3 +80,8 @@ def test_listing_pipeline():
     r = pipeline(dict(url=""), listing_funcs)
     assert "error" not in r.keys()
     assert "listings" in r.keys()
+
+
+# def test_train():
+#     df_in = pd.read_parquet("../data/bizwiz_value_score_2.parquet")
+#     train(df_in, "../data/bizwiz_value_score_2.test.joblib")

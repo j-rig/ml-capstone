@@ -66,6 +66,12 @@ class Contact(db.Model):
     message = db.Column(db.String())
 
 
+class Url(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String())
+    ts = db.Column(db.DateTime)
+
+
 # Create forms
 
 
@@ -123,6 +129,7 @@ class AuthModelView(ModelView):
 
 admin.add_view(AuthModelView(Prediction, db.session))
 admin.add_view(AuthModelView(Contact, db.session))
+admin.add_view(AuthModelView(Url, db.session))
 
 
 def as_dollar(n):
@@ -140,6 +147,12 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/blog")
+def blog():
+    check_uuid()
+    return render_template("blog.html")
+
+
 @app.route("/detail/<page_id>")
 def detail(page_id):
     pl = (
@@ -154,14 +167,15 @@ def detail(page_id):
 @app.route("/dash", methods=["GET", "POST"])
 def dash():
     check_uuid()
-    listings = []
-    if "listings" not in session:
-        o = pipeline(dict(), listing_funcs)
-        if "error" not in o.keys():
-            session["listings"] = o["listings"]
-    else:
-        listings = session["listings"]
-    js_listings = [f"'{x}'" for x in listings]
+    # listings = []
+    # if "listings" not in session:
+    #     o = pipeline(dict(), listing_funcs)
+    #     if "error" not in o.keys():
+    #         session["listings"] = o["listings"]
+    # else:
+    #     listings = session["listings"]
+    listings = Url.query.distinct(Url.url).order_by(Url.id.desc()).limit(100).all()
+    js_listings = [f"'{x.url}'" for x in listings]
     js_listings = ",\n".join(js_listings)
     js_listings = f"listings=[{js_listings}];"
     form = BizBuySellUrlForm()
@@ -261,6 +275,25 @@ class bizBuySellUrl(Resource):
 
 
 api.add_resource(bizBuySellUrl, "/api/bizbuysell/url")
+
+
+class bizBuySellListings(Resource):
+    def get(self):
+        listings = []
+        ts = datetime.datetime.utcnow()
+        o = pipeline(dict(), listing_funcs)
+        if "error" not in o.keys():
+            listings = o["listings"]
+        for l in listings:
+            u = Url()
+            u.url = l
+            u.ts = ts
+            db.session.add(u)
+        db.session.commit()
+        return jsonify(listings)
+
+
+api.add_resource(bizBuySellListings, "/api/bizbuysell/listings")
 
 with app.app_context():
     db.create_all()
