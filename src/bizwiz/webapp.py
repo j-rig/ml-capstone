@@ -22,7 +22,7 @@ from werkzeug.exceptions import HTTPException
 from flask_bootstrap import Bootstrap
 
 
-from bizwiz.pipeline import pipeline, predict_funcs, listing_funcs
+from bizwiz.pipeline import pipeline, predict_funcs, listing_funcs, bad_types
 
 locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
@@ -90,6 +90,11 @@ def bbs_url_validator(form, field):
     url = field.data
     if not url.lower().startswith(base_url.lower()):
         raise validators.ValidationError(f"Url must begin with {base_url}")
+    for t in bad_types:
+        if t in url.lower():
+            raise validators.ValidationError(
+                f"Only businesses for sale, {t} not supported in model"
+            )
 
 
 class BizBuySellUrlForm(Form):
@@ -284,7 +289,12 @@ class bizBuySellListings(Resource):
         o = pipeline(dict(), listing_funcs)
         if "error" not in o.keys():
             listings = o["listings"]
+        listings_bad = []
         for l in listings:
+            # TODO fix me
+            # for t in bad_types:
+            #     if t in l.lower():
+            #         listings_bad.append(l)
             u = Url()
             u.url = l
             u.ts = ts

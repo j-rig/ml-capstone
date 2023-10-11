@@ -71,6 +71,8 @@ ua = [
 
 base_url = "https://www.bizbuysell.com/Business-Opportunity"
 
+bad_types = ["franchise", "lease", "auction", "rent"]
+
 
 def preprocess_text(text):
     text = text.lower()
@@ -95,6 +97,14 @@ def validate_url(o):
             data=f"url must start with {base_url}",
         )
         return False, o
+    for t in bad_types:
+        if t in o["url"].lower():
+            o["error"] = dict(
+                code=1000,
+                message=f"model does not support {t}",
+                data=bad_types,
+            )
+            return False, o
     try:
         urlparse(o["url"])
     except:
@@ -153,6 +163,14 @@ def extract_title(o):
     if o["title"] == "":
         o["error"] = dict(code=4, message="failed to get title", data="")
         return False, o
+    for t in bad_types:
+        if t in o["title"].lower():
+            o["error"] = dict(
+                code=1000,
+                message=f"model does not support {t}",
+                data=bad_types,
+            )
+            return False, o
     return True, o
 
 
