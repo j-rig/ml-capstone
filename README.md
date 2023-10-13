@@ -4,6 +4,8 @@ This project aims to develop a machine learning model to predict the price of a 
 
 The project is implemented as a web application with an REST API that can be used by other applications to integrate the price prediction functionality.
 
+<bold> live demo: https://jrig.pythonanywhere.com/ </bold> 
+
 ## Installation and Usage Instructions
 
 ### Build Environment

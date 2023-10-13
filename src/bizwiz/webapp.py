@@ -238,14 +238,14 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/env")
-@basic_auth.required
-def env():
-    def generate():
-        for k, v in os.environ.items():
-            yield f"{k}={v}\n"
-
-    return Response(generate(), mimetype="text/plain")
+# @app.route("/env")
+# @basic_auth.required
+# def env():
+#     def generate():
+#         for k, v in os.environ.items():
+#             yield f"{k}={v}\n"
+#
+#     return Response(generate(), mimetype="text/plain")
 
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -289,12 +289,13 @@ class bizBuySellListings(Resource):
         o = pipeline(dict(), listing_funcs)
         if "error" not in o.keys():
             listings = o["listings"]
-        listings_bad = []
+        listings_out = listings
         for l in listings:
-            # TODO fix me
-            # for t in bad_types:
-            #     if t in l.lower():
-            #         listings_bad.append(l)
+            for t in bad_types:
+                if t in l.lower():
+                    listings_out.remove(l)
+                    break
+        for l in listings_out:
             u = Url()
             u.url = l
             u.ts = ts

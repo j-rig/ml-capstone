@@ -281,11 +281,11 @@ def predict_price(o):
     ]
     Xtest = vect_text.transform(docs)
     # print(Xtest)
-    importance = np.argsort(np.asarray(Xtest.sum(axis=0)).ravel())[::-1]
-    feature_names = np.array(vect_text.get_feature_names_out())
+    # importance = np.argsort(np.asarray(Xtest.sum(axis=0)).ravel())[::-1]
+    # feature_names = np.array(vect_text.get_feature_names_out())
     # print(Xtest[importance[:20]])
-    o["pwords"] = [str(x) for x in feature_names[importance[:20]]]
-    o["pwi"] = [float(x) for x in importance[:20]]
+    # o["pwords"] = [str(x) for x in feature_names[importance[:20]]]
+    # o["pwi"] = [float(x) for x in importance[:20]]
 
     # get the first vector out (for the first document)
     first_vector_tfidfvectorizer = Xtest[0]
