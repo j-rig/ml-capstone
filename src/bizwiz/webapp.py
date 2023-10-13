@@ -289,13 +289,13 @@ class bizBuySellListings(Resource):
         o = pipeline(dict(), listing_funcs)
         if "error" not in o.keys():
             listings = o["listings"]
-        listings_out = listings
+        # listings_out = listings
+        # for l in listings:
+        #     for t in bad_types:
+        #         if t in l.lower():
+        #             listings_out.remove(l)
+        #             break
         for l in listings:
-            for t in bad_types:
-                if t in l.lower():
-                    listings_out.remove(l)
-                    break
-        for l in listings_out:
             u = Url()
             u.url = l
             u.ts = ts

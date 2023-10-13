@@ -392,11 +392,24 @@ def extract_listings(o):
     return False, o
 
 
+def remove_bad_listings(o):
+    logger.info("removing bad listings")
+    listings_out = o["listings"]
+    for l in o["listings"]:
+        for t in bad_types:
+            if t in l.lower():
+                listings_out.remove(l)
+                break
+    o["listings"] = listings_out
+    return True, o
+
+
 listing_funcs = [
     set_listings_url,
     get_page,
     get_metadata,
     extract_listings,
+    remove_bad_listings,
 ]
 
 
