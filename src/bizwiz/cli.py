@@ -4,7 +4,7 @@ import json
 import logging
 
 from bizwiz.pipeline import pipeline, predict_funcs, listing_funcs
-from bizwiz.train import train
+from bizwiz.train import train, batch_train
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,6 +42,14 @@ def train_cmd(parquet, joblib):
     """train a model from parquet file and save to a joblib file"""
     df_in = pd.read_parquet(parquet)
     train(df_in, joblib)
+
+
+@main.command("btrain")
+@click.argument("parquet_path", type=click.Path(exists=True))
+@click.argument("joblib", type=click.Path(exists=False))
+def batch_train_cmd(parquet_path, joblib):
+    """batch train a model from a folder of parquet files and save to a joblib file"""
+    batch_train(parquet_path, joblib)
 
 
 if __name__ == "__main__":

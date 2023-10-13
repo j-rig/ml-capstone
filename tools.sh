@@ -70,6 +70,8 @@ run_webapp_venv(){
 }
 
 package_bizwiz(){
+  fmt_it;
+  test_it;
   cd src/;
   python setup.py sdist;
   cd ../;
