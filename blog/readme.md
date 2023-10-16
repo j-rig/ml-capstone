@@ -1,4 +1,0 @@
-
-use pelican
-
-see quickstart

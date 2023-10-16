@@ -187,7 +187,10 @@ def dash():
     if form.validate_on_submit():
         pred = Prediction()
         pred.ts = datetime.datetime.utcnow()
-        pred.ip = request.remote_addr
+        if request.headers.getlist("X-Forwarded-For"):
+            pred.ip = request.headers.getlist("X-Forwarded-For")[0]
+        else:
+            pred.ip = request.remote_addr
         pred.uuid = session["uuid"]
         pred.url = form.url.data
         h = hashlib.new("sha256")
@@ -255,7 +258,10 @@ def contact():
     if form.validate_on_submit():
         contact = Contact()
         contact.ts = datetime.datetime.utcnow()
-        contact.ip = request.remote_addr
+        if request.headers.getlist("X-Forwarded-For"):
+            contact.ip = request.headers.getlist("X-Forwarded-For")[0]
+        else:
+            contact.ip = request.remote_addr
         contact.uuid = session["uuid"]
         contact.email = form.email.data
         contact.message = form.message.data

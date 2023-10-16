@@ -12,7 +12,7 @@ setup_venv(){
 
 fmt_it(){
   echo "formating...";
-  black src test;
+  black src test blog;
 }
 
 lint_it(){
@@ -72,6 +72,8 @@ run_webapp_venv(){
 package_bizwiz(){
   fmt_it;
   test_it;
+  cp blog/static/*.png src/bizwiz/static;
+  python blog/proc_blog.py blog/blog.html > src/bizwiz/templates/blog.html;
   cd src/;
   python setup.py sdist;
   cd ../;
