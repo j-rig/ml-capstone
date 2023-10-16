@@ -10,6 +10,11 @@
 
 
 <h2>Intro</h2>
+Opening sentence that draws in the reader (ie personal story)
+What is the context for the problem we’re solving
+Why would this be useful/to whom?
+In brief (1/2 sentences max), what are we doing
+
 <p>
 The problem I want to solve is how to accurately evaluate the price of
 a business for sale.
@@ -37,6 +42,13 @@ learning model to predict the business price.
 <a href="https://www.bizbuysell.com/businesses-for-sale/" target="_blank">
 <img src="static/bbs.png" alt='www.bizbuysell.com'></img>
 </a>
+
+How did you get the data
+What does the final dataset look like
+Include any decisions that someone would want to know about
+(err on the side of being sparse here)
+
+
 <p>
 
 The data that I will use to solve this problem is the data that
@@ -58,11 +70,17 @@ craigslist.org
 
 data.gov
 
+
+300K raw samples
+
 </p>
 
 <h2>EDA</h2>
 <p>
-EDA
+ put in data storytelling doc, and write brief explanation of why they are meaningful
+
+ A question to answer each time might be: "Is the takeaway of
+ this chart what we expected? If so, why? If not, why might we be seeing this?"
 
 <img src="static/map3d.png"></img>
 
@@ -72,13 +90,44 @@ EDA
 
 
 
-<img src="static/top_listing_by_state.png"></img>
-<img src="static/top_mean_price_state.png"></img>
+<!-- <img src="static/top_listing_by_state.png"></img>
+<img src="static/top_mean_price_state.png"></img> -->
+
+
+<img src="static/mcfps.png"></img>
+<img src="static/mcfgrs.png"></img>
+
+<img src="static/mcfpc.png"></img>
+<img src="static/mcfgrc.png"></img>
+
+
+title
+description
+details
+financials
+price
+cash flow
+gross revenue
+category
+similar to
+
+location
+median houshold income
+poverty percent
+
+
+structured data extruct
+
 
 
 </p>
 
 <h2>Feature Importance</h2>
+
+Explain what the most important features are and why that might be.
+Again, answer the question: "is this what you expected?
+If so, why? If not, why might we be seeing this?"
+
 <p>
 Feature Importance
 
@@ -86,9 +135,14 @@ Feature Importance
 <img src="static/top_desc_words.png"></img>
 <img src="static/top_bigram_desc.png"></img>
 
-CountVectorizer
+coombined title descrioption, details and finanicals text
 
-TdifVectorizer
+lower case
+removed stop words
+stemming
+n grams
+
+CountVectorizer bad, TdifVectorizer good
 
 </p>
 
@@ -100,10 +154,29 @@ Feature Selection
 <img src="static/iqr_price_scat.png"></img>
 <img src="static/iqr_price_hist2.png"></img>
 
+used IQR on price
+
+similar to not helpful
+category not helpful
+
+cash flow gross revenue  helpful
+
+median houshold income poverty percent ended up not using
+
+autofeat over fit
+
 
 </p>
 
 <h2>Modeling</h2>
+
+Make a table with 3 columns
+Model Name
+Best Parameters (after grid searching)
+Optimal Feature Set (Abbreviation/#of features)
+Cross-Validated Score (ROC_AUC)
+
+
 <p>
 Modeling
 
@@ -116,6 +189,12 @@ Modeling
 </p>
 
 <h2>Conclusion</h2>
+
+What were the major findings
+Tie back to intro/how this would be used
+Next steps/Assumptions/Future Work
+
+
 <p>
 Conclusion
 </p>
