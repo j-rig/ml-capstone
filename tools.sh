@@ -72,7 +72,7 @@ run_webapp_venv(){
 package_bizwiz(){
   fmt_it;
   test_it;
-  cp blog/static/*.png src/bizwiz/static;
+  cp blog/static/*.* src/bizwiz/static;
   python blog/proc_blog.py blog/blog.html > src/bizwiz/templates/blog.html;
   cd src/;
   python setup.py sdist;

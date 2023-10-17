@@ -4,210 +4,450 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css">
+
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+
 </head>
 
 <h1><a href="{{ url_for('home') }}">BizWiz</a></h1>
 
-
 <h2>Intro</h2>
-Opening sentence that draws in the reader (ie personal story)
+
+<!-- Opening sentence that draws in the reader (ie personal story)
 What is the context for the problem we’re solving
 Why would this be useful/to whom?
-In brief (1/2 sentences max), what are we doing
+In brief (1/2 sentences max), what are we doing -->
 
 <p>
-The problem I want to solve is how to accurately evaluate the price of
+How much is a business worth? This is a question that many business buyers and sellers struggle to answer.
+</p>
+
+<p>
+The problem this project to solves is how to accurately evaluate the price of
 a business for sale.
 This is an interesting problem because it is complex and there is no
 one-size-fits-all solution.
 The price of a business depends on many factors, including its
 financial performance, industry, location, and the overall market conditions.
-By using NLP to extract relevant information from business listings,
+By using natural language processing to extract relevant information from business listings,
 such as the business's revenue, profit, industry, and location,
 we can develop a model that can predict the business
 price with a high degree of accuracy.
-This information could then be used by buyers to identify businesses
+This information can then be used by buyers and sellers to identify businesses
 that are undervalued or overpriced.
 </p>
 
-<p>
-This is a supervised learning problem, as I am trying
-to predict a continuous value (the business price) based on a set
-of predictor variables (such as the business's listing text,
-financials, category, and location). I will use a machine
-learning model to predict the business price.
-</p>
-
 <h2>Dataset</h2>
-<a href="https://www.bizbuysell.com/businesses-for-sale/" target="_blank">
-<img src="static/bbs.png" alt='www.bizbuysell.com'></img>
-</a>
 
-How did you get the data
+<!-- How did you get the data
 What does the final dataset look like
-Include any decisions that someone would want to know about
-(err on the side of being sparse here)
+Include any decisions that someone would want to know about (err on the side of being sparse here) -->
 
+
+<!-- <a href="https://www.bizbuysell.com/businesses-for-sale/" target="_blank">
+<img src="static/bbs.png" alt='www.bizbuysell.com'></img>
+</a> -->
 
 <p>
+The data that was used to solve this problem
+is publicly available on many websites. Data was collected from
+<a href="https://www.bizbuysell.com/" target="_blank">bizbuysell.com</a>,
+<a href="https://www.businessesforsale.com/" target="_blank">businessesforsale.com</a> and
+<a href="https://craigslist.org/" target="_blank">craigslist.org</a>.
 
-The data that I will use to solve this problem is the data that
-is publicly available on the BuizBuySell website.
-This data includes business listings, financial data,
-and industry information.
-I will acquire this data using web scraping techniques.
-
-
-Intally used Scrapy to get data
-Needed to use Custom Scripts because of scraping/bot protection
-www.bizbuysell.coml provided to most high quality data sets for this
-project and is the final selection
-
-
-www.bizbuysell.com
-us.businessesforsale.com
-craigslist.org
-
-data.gov
-
-
-300K raw samples
-
+It was found that bizbuysell.com data was the best and 300,000 listings
+were collected into this dataset.
 </p>
+
+<p>
+Initially
+<a href="https://scrapy.org/" target="_blank">scrapy</a>
+was tested to crawl the data, but custom scripts
+using the
+<a href="https://requests.readthedocs.io/" target="_blank">requests</a>
+library were created to get over technical hurdles
+collecting from these sources.
+
+The raw html pages for all the listings were archived and processed
+later. This allowed for better understanding and extraction of the dataset
+versus extraction at collection time. Data collection was aided by
+examining the
+<a href="https://en.wikipedia.org/wiki/Robots.txt" target="_blank">robots.txt</a>
+and
+<a href="https://en.wikipedia.org/wiki/Sitemaps" target="_blank">sitemap.xml</a>
+files.
+</p>
+
+<table>
+  <caption>Dataset</caption>
+  <tr>
+    <th>column</th>
+    <th>data type</th>
+    <th>notes</th>
+  </tr>
+  <tr>
+    <td>id</td>
+    <td>number</td>
+    <td>unique listing identifer</td>
+  </tr>
+  <tr>
+    <td>url</td>
+    <td>string</td>
+    <td>listing hyperlink</td>
+  </tr>
+  <tr>
+    <td>title</td>
+    <td>text</td>
+    <td>title of listing</td>
+  </tr>
+  <tr>
+    <td>description</td>
+    <td>text</td>
+    <td>description</td>
+  </tr>
+  <tr>
+    <td>details</td>
+    <td>text</td>
+    <td>listing details</td>
+  </tr>
+  <tr>
+    <td>financials</td>
+    <td>text</td>
+    <td>listing financials</td>
+  </tr>
+  <tr>
+    <td>price</td>
+    <td>number</td>
+    <td>listing price extracted from finanicals</td>
+  </tr>
+  <tr>
+    <td>cash flow</td>
+    <td>number</td>
+    <td>listing cash flow extracted from finanicals</td>
+  </tr>
+  <tr>
+    <td>gross revenue</td>
+    <td>number</td>
+    <td>listing gross revenue extracted from finanicals</td>
+  </tr>
+  <tr>
+    <td>category</td>
+    <td>list of strings</td>
+    <td>a list of catigories for this listing, includes location info</td>
+  </tr>
+  <tr>
+    <td>similar to</td>
+    <td>list of numbers</td>
+    <td>a list of ids of "similar" listings</td>
+  </tr>
+</table>
+
+<p>
+After collecting the data,
+<a href="https://www.crummy.com/software/BeautifulSoup/" target="_blank">beautiful soup</a>
+and
+<a href="https://github.com/scrapinghub/extruct" target="_blank">extruct</a>
+libraries were used
+to process the data into
+<a href="https://pandas.pydata.org/" target="_blank">pandas</a>
+dataframes for further exploration
+and analysis.
+</p>
+
 
 <h2>EDA</h2>
 <p>
- put in data storytelling doc, and write brief explanation of why they are meaningful
+ <!-- put in data storytelling doc, and write brief explanation of why they are meaningful
 
  A question to answer each time might be: "Is the takeaway of
- this chart what we expected? If so, why? If not, why might we be seeing this?"
+ this chart what we expected? If so, why? If not, why might we be seeing this?" -->
+
+ After collecting and cleaning the dataset, during exploratory data analysis (EDA)
+ additional useful features were added as shown in the table below.
+
+ EDA was an iterative process and time was taken to plot and explore all the
+ data collected and generated.
+</p>
+
+<table>
+  <caption>Dataset features created</caption>
+  <tr>
+    <th>column</th>
+    <th>data type</th>
+    <th>notes</th>
+  </tr>
+  <tr>
+    <td>lat</td>
+    <td>number</td>
+    <td>lattiude for location</td>
+  </tr>
+  <tr>
+    <td>lon</td>
+    <td>number</td>
+    <td>longitude for location</td>
+  </tr>
+  <tr>
+    <td>h3</td>
+    <td>string</td>
+    <td>h3 index for location</td>
+  </tr>
+  <tr>
+    <td>cf_p</td>
+    <td>number</td>
+    <td>(cash flow)/(price)</td>
+  </tr>
+  <tr>
+    <td>cf_gr</td>
+    <td>number</td>
+    <td>(cash flow)/(gross revenue)</td>
+  </tr>
+  <tr>
+    <td>median houshold income</td>
+    <td>number</td>
+    <td>median houshold income for region, see <a href="https://data.gov/" target="_blank">data.gov</a></td>
+  </tr>
+  <tr>
+    <td>poverty percent</td>
+    <td>number</td>
+    <td>poverty percent for region, see <a href="https://data.gov/" target="_blank">data.gov</a></td>
+  </tr>
+</table>
 
 <img src="static/map3d.png"></img>
 
+<p>
+One of the first features created was location information. This was added to
+the dataset and lat/long/<a href="https://h3geo.org/" target="_blank">H3</a>
+data geolocates all the listings.
 
+The count of businesses was aggregated by H3 cell location and plotted
+on a 3D map to visualize the dataset. It can be seen that most of the
+listings are concentrated on the coasts and large metropolitan areas of
+the country. This dataset is US only.
 
+</p>
 
-
-
+<p>
+  It was interesting to look at some aggregate financial information.
+  The ratios (cash flow)/(price) and (cash flow)/(gross revenue) was calculated.
+  The first ratio gives a good indication of return on investment, while
+  the second gives a good indication of how much capital is tied up in the
+  business while it is in operation.
+</p>
 
 <!-- <img src="static/top_listing_by_state.png"></img>
 <img src="static/top_mean_price_state.png"></img> -->
 
 
 <img src="static/mcfps.png"></img>
+<p>
+  From the plot above it can be seen that on average businesses in Hawaii have the highest
+  average ROI.
+</p>
+
 <img src="static/mcfgrs.png"></img>
+<p>
+  From the plot above it can be seen that on average businesses in Idaho have the lowest
+  average operational cost relative to profits. Interestingly, Hawaii is
+  in second place for this ratio as well.
+</p>
 
 <img src="static/mcfpc.png"></img>
+<p>
+  When looking at the data by category, on average campgrounds and rv parks
+  stand out as profitable with a low initial investment.
+</p>
+
 <img src="static/mcfgrc.png"></img>
-
-
-title
-description
-details
-financials
-price
-cash flow
-gross revenue
-category
-similar to
-
-location
-median houshold income
-poverty percent
-
-
-structured data extruct
+<p>
+  When looking at the data by category, on average medical billing stands out
+  as profitable with low operational costs.
+</p>
 
 <img src="static/desc_wordcloud.png"></img>
 
+<p>
+  To get an idea of the text in the different sections, wordclouds
+  were generated. The plot above showing the wordcloud of the listing
+  descriptions gives a feel of the overall content of the description corpus.
 </p>
+
 
 <h2>Feature Importance</h2>
 
-Explain what the most important features are and why that might be.
+<!-- Explain what the most important features are and why that might be.
 Again, answer the question: "is this what you expected?
-If so, why? If not, why might we be seeing this?"
+If so, why? If not, why might we be seeing this?" -->
 
 <p>
-Feature Importance
+This project aims to use the listing text as a primary source of model features.
+To turn text into model features it must be vectorized.
 
+Both
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html" target="_blank">CountVectorizer</a>
+and
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html" target="_blank">TfidfVectorizer</a>
+can be used to understand
+feature importance. However, TfidfVectorizer is generally more
+effective for this purpose, because it takes into account
+the relative importance of words in a document. Model testing during using this
+project dataset confirmed that TfidfVectorizer produces superior features.
+</p>
 
-<h3>CountVectorizer</h3>
-<img src="static/top_title_words.png"></img>
+<!-- <img src="static/top_title_words.png"></img> -->
 <img src="static/top_desc_words.png"></img>
 <img src="static/top_bigram_desc.png"></img>
+<p>
+To understand feature importance with CountVectorizer,
+we can simply look at the frequency of each word in the corpus.
+The words with the highest frequencies are likely to be the most important
+features for our machine learning model. The graphs above show the word
+counts of the description corpus.
+</p>
 
-<h3>TdifVectorizer</h3>
 <img src="static/to_30_tfidf.png"></img>
+<p>
+To understand feature importance with TfidfVectorizer, we can use a variety
+of methods. One common approach is to look at the IDF scores of each word.
+The words with the highest IDF scores are likely to be the most
+informative features for our machine learning model.
+The graph above show the highest IDF scores of the entire corpus. "000" can
+be ignored as an artifact of leaving numbers in the text before tokenization.
+</p>
 
-coombined title descrioption, details and finanicals text
+<p>
+Feature selection involves identifying and removing the least
+important features from our dataset. This can improve the performance of
+our machine learning model and reduce the risk of overfitting. Efforts
+to use feature selection to remove words from the dataset may be
+explored in the future, but initial tests showed diminishing returns and
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html" target="_blank">priniciple component analysis (PCA)</a>
+was chosen and a alternate process to reduce the dimensions of the text feature set.
+</p>
+
+<!-- coombined title descrioption, details and finanicals text
 
 lower case
 removed stop words
 stemming
 n grams
 
-CountVectorizer bad, TdifVectorizer good
+CountVectorizer bad, TdifVectorizer good -->
 
-</p>
 
 <h2>Feature Selection</h2>
 <p>
-Feature Selection
+<!-- Feature Selection
 
 <img src="static/raw_price_scat.png"></img>
 <img src="static/iqr_price_scat.png"></img>
 <img src="static/iqr_price_hist2.png"></img>
 
-used IQR on price
+used IQR on price -->
 
-similar to not helpful
-category not helpful
+<p>
+After exploring primarily text feature importance preliminary models were
+created to test performance on different combinations of features.
+</p>
 
-cash flow gross revenue  helpful
+<img src="static/sgdr_pred_vs_price.png"></img>
 
-median houshold income poverty percent ended up not using
+<p>
+The best performance from the text only features was accomplished
+by combining all the listing text and processing it with the TfidfVectorizer
+and training it with a
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html" target="_blank">SGDRegressor</a>.
+As seen in the plot above, the predicted vs actual performance of this initial text only model
+was not acceptable and needed further improvement.
+</p>
 
-autofeat over fit
+<img src="static/r2_scores.png"></img>
 
+<p>
+After generating the text only predictive model as a baseline,
+the other available features were tested to see their relative performance.
 
+To join the feature sets together (
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.hstack.html" target="_blank">hstack</a>
+) it was desirable to reduce the
+text feature dimensions. PCA compression on the text features was tested and it was found that
+reducing the text features from ~10k columns down to 1k columns didn't significantly
+reduce the model performance. Reducing the columns down to 100 columns
+significantly reduced the model performance as seen in the plot above. Categories
+alone performed very poorly and its features and were not used in further testing.
+Numerical features performed very well as seen in the graph above,
+compressed text plus numerical features performed even better.
+
+</p>
+
+<p>
+Next, automatic feature generation using
+<a href="https://github.com/cod3licious/autofeat" target="_blank">autofeat</a>
+was explored.
+This resulted in very impressive model performance and most definitely over
+fitting of the model. After exploring this option it was decided to only include
+some manually generated features who's importance could be justified.
 </p>
 
 <h2>Modeling</h2>
 
-Make a table with 3 columns
+<!-- Make a table with 3 columns
 Model Name
 Best Parameters (after grid searching)
 Optimal Feature Set (Abbreviation/#of features)
-Cross-Validated Score (ROC_AUC)
+Cross-Validated Score (ROC_AUC) -->
 
+
+<img src="static/r2_models_2.png"></img>
 
 <p>
-Modeling
 
-<img src="static/sgdr_pred_vs_price.png"></img>
+The combined feature set was trained on many linear and ensemble models to
+search for the best performance. Once the best performing models were found,
+a grid search was performed to tune for the optimal hyperparameters.
 
-<img src="static/r2_scores.png"></img>
-<img src="static/r2_models_2.png"></img>
+In the end a model was selected that performed very well and exceeded the project
+expectations for MSE and r2 score.
+
+The final model uses predicted price from the text as a feature along with
+the other numerical features and is trained on a
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html" target="_blank">GradientBoostingRegressor</a>
+
+model.
 
 
 </p>
 
 <h2>Conclusion</h2>
 
-What were the major findings
+<!-- What were the major findings
 Tie back to intro/how this would be used
-Next steps/Assumptions/Future Work
+Next steps/Assumptions/Future Work -->
 
 
 <p>
-Conclusion
+In this article, we have discussed the process of text classification
+and how to build a model to predict the
+price of a business from its listing text.
+We have also explored a variety of feature selection and modeling techniques.
+
+We found that the best performing model used a combination of text features
+and numerical features.
+The model also used a predicted price from the text as a feature.
+ This confirms that there is significant
+ information in the text that can be used to predict the price,
+ even after accounting for the other numerical features.
+
+This project solves an important need to  accurately evaluate the price of a business for sale from a detailed listing.
 </p>
-
-
-
-
-
+  <p>
+We will continue to improve this model by improving feature extraction and selection as well as further
+model optimization and application of deep learning techniques. For further information, please contact
+us!
+</p>
 
 
 
