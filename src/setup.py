@@ -18,6 +18,8 @@ setup(
             "static/*.css",
             "static/*.js",
             "static/*.gif",
+            "static/*.png",
+            "static/*.webmanifest",
             "templates/*.html",
         ]
     },
